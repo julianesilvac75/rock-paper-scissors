@@ -13,7 +13,7 @@ function computerPlay() {
         case 3:
             return SCISSORS;
         default:
-            break
+            break;
     }
 }
 
@@ -26,7 +26,7 @@ function rockRules(opponent) {
         case ROCK:
             return "It's a tie!";
         default:
-            return 'Invalid input';
+            return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
     }
 }
 
@@ -39,7 +39,7 @@ function paperRules(opponent) {
         case ROCK:
             return "You lost! Paper beats Rock!";
         default:
-            return 'Invalid input';
+            return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
     }
 }
 
@@ -50,14 +50,13 @@ function scissorsRules(opponent) {
         case SCISSORS:
             return "It's a tie!";
         case ROCK:
-            return 'You win! Rock beats Scissors!'
+            return 'You win! Rock beats Scissors!';
         default:
-            return 'Invalid input';
+            return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
     }
 }
 
 function playRound(playerSelection, computerSelection) {
-    // !! use trim function in the future
     const lowerPlayerSelection = playerSelection.toLowerCase().trim();
 
     if (computerSelection === ROCK) {
@@ -65,16 +64,56 @@ function playRound(playerSelection, computerSelection) {
     } else if (computerSelection === PAPER) {
         return paperRules(lowerPlayerSelection);
     } else {
-        return scissorsRules(lowerPlayerSelection)
+        return scissorsRules(lowerPlayerSelection);
     }
 }
 
-const playerSelection = 'SCISSORS';
-// const playerSelection = 'PAPER';
-// const playerSelection = '     paper';
-// const playerSelection = 'paper   ';
-// const playerSelection = '    paper    ';
-const computerSelection = computerPlay();
+function partialResultsGenerator(roundsCount, computerSelection, roundResult, { player, computer }) {
+    const resultMessage = `ROUND ${roundsCount}
+        Computer bet: ${computerSelection}\n
+        ${roundResult}\n
+        Player ${player} X ${computer} Computer
+        ---`;
 
-console.log('computador:', computerSelection);
-console.log(playRound(playerSelection, computerSelection));
+    console.log(resultMessage);
+}
+
+function finalResultsGenerator({ player, computer }) {
+    if (player > computer) {
+        console.log(`YOU'RE A WINNER!\nFinal result: player ${player} X ${computer} computer`);
+    } else if (player < computer) {
+        console.log(`You lost the game =(\nFinal result: player ${player} X ${computer} computer`);
+    } else {
+        console.log(`It's a tie!\nFinal result: player ${player} X ${computer} computer`);
+    }
+}
+
+function game() {
+    let roundsCount = 1;
+    const totalPoints = {
+        player: 0,
+        computer: 0,
+    };
+
+    while (roundsCount <= 5) {
+        const playerSelection = prompt("Let's play 'Rock Paper Scissors'! What's your bet?");
+        const computerSelection = computerPlay();
+        const roundResult = playRound(playerSelection, computerSelection);
+    
+        if (roundResult.includes('win')) {
+            totalPoints.player += 1;
+        } else if (roundResult.includes('lost')) {
+            totalPoints.computer += 1;
+        }
+        
+        partialResultsGenerator(roundsCount, computerSelection, roundResult, totalPoints);
+
+        if (!(roundResult.includes('Invalid input'))) {
+            roundsCount += 1;
+        }
+    }
+
+    finalResultsGenerator(totalPoints);
+}
+
+game();
