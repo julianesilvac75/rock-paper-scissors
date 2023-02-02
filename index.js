@@ -104,6 +104,16 @@ function validatePlayerSelection() {
     }
 }
 
+function checkRoundWinner(roundResult) {
+    if (roundResult.includes('win')) {
+        return 'player';
+    } else if (roundResult.includes('lost')) {
+        return 'computer';
+    }
+
+    return undefined;
+}
+
 function game() {
     let roundsCount = 1;
     let cancelMessage;
@@ -116,11 +126,10 @@ function game() {
         const playerSelection = validatePlayerSelection();
         const computerSelection = computerPlay();
         const roundResult = playRound(playerSelection, computerSelection);
-    
-        if (roundResult.includes('win')) {
-            totalPoints.player += 1;
-        } else if (roundResult.includes('lost')) {
-            totalPoints.computer += 1;
+        const roundWinner = checkRoundWinner(roundResult);
+        
+        if (roundWinner) {
+            totalPoints[roundWinner] += 1;
         } else if (roundResult.includes('leave')) {
             cancelMessage = roundResult;
             break;
