@@ -26,7 +26,7 @@ function rockRules(opponent) {
         case ROCK:
             return "It's a tie!";
         default:
-            return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
+            return opponent;
     }
 }
 
@@ -39,7 +39,7 @@ function paperRules(opponent) {
         case ROCK:
             return "You lost! Paper beats Rock!";
         default:
-            return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
+            return opponent;
     }
 }
 
@@ -52,19 +52,18 @@ function scissorsRules(opponent) {
         case ROCK:
             return 'You win! Rock beats Scissors!';
         default:
-            return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
+            return opponent;
     }
 }
 
 function playRound(playerSelection, computerSelection) {
-    const lowerPlayerSelection = playerSelection.toLowerCase().trim();
-
-    if (computerSelection === ROCK) {
-        return rockRules(lowerPlayerSelection);
-    } else if (computerSelection === PAPER) {
-        return paperRules(lowerPlayerSelection);
-    } else {
-        return scissorsRules(lowerPlayerSelection);
+    switch (computerSelection) {
+        case ROCK:
+            return rockRules(playerSelection);
+        case PAPER:
+            return paperRules(playerSelection);
+        default:
+            return scissorsRules(playerSelection);
     }
 }
 
@@ -88,15 +87,33 @@ function finalResultsGenerator({ player, computer }) {
     }
 }
 
+function validatePlayerSelection() {
+    const validOptions = [ROCK, PAPER, SCISSORS];
+    const playerSelection = prompt("Let's play 'Rock Paper Scissors'! What's your bet?");
+
+    if (playerSelection === null) {
+        return "I'm sorry you have to leave! Hope to see you soon =)";
+    }
+
+    const lowerPlayerSelection = playerSelection.toLowerCase().trim();
+
+    if (validOptions.includes(lowerPlayerSelection)) {
+        return lowerPlayerSelection;
+    } else {
+        return "Invalid input! Try 'Rock', 'Paper' or 'Scissors'.";
+    }
+}
+
 function game() {
     let roundsCount = 1;
+    let cancelMessage;
     const totalPoints = {
         player: 0,
         computer: 0,
     };
 
     while (roundsCount <= 5) {
-        const playerSelection = prompt("Let's play 'Rock Paper Scissors'! What's your bet?");
+        const playerSelection = validatePlayerSelection();
         const computerSelection = computerPlay();
         const roundResult = playRound(playerSelection, computerSelection);
     
@@ -104,6 +121,9 @@ function game() {
             totalPoints.player += 1;
         } else if (roundResult.includes('lost')) {
             totalPoints.computer += 1;
+        } else if (roundResult.includes('leave')) {
+            cancelMessage = roundResult;
+            break;
         }
         
         partialResultsGenerator(roundsCount, computerSelection, roundResult, totalPoints);
@@ -113,7 +133,11 @@ function game() {
         }
     }
 
-    finalResultsGenerator(totalPoints);
+    if (cancelMessage) {
+        console.log(cancelMessage);
+    } else {
+        finalResultsGenerator(totalPoints);
+    }
 }
 
 game();
